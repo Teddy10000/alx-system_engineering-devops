@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+udo sed -i '/listen 80 default_server/a rewrite ^/redirect_me https://twitter.com/teddy_10000 permanent;' /etc/ngin    x/sites-available/default!/usr/bin/env bash
 # Configure Nginx server so it redirects me to another page.
 
 sudo apt-get -y update
