@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# This script does the following by first installling nginx:
+#    - Listens on port 80 and Returns Hello World.
+#      at the root with a curl GET request.
+#    - Configures a /redirect_me to "301 Moved Permanently".
+#    - Has a custom web page containing "Page not found".
+#   - Has a custom HTTP header named X-Served-By.
+#  - The value of the HTTP header is the hostname of the current server.
+
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get install -y nginx
+
+mkdir -p /var/www/html
+touch /var/www/html/index.html
+echo "Hello World!" > /var/www/html/index.html
+touch /var/www/html/custom404.html
+echo "Page not Found" > /var/www/html/custom404.html
+
+server="server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    add_header X-Served-By $HOSTNAME;
+    root   /var/www/html;
+    index  index.html index.htm;
+    location /redirect_me {
+        return 301 http://twitter.com/;
+    }
+    error_page 404 /custom404.html;
+    location /404 {
+      root /var/www/html;
+      internal;
+    }
+}"
+sudo echo > /etc/nginx/sites-available/default
+
+sudo service nginx restart
