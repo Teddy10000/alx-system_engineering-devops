@@ -2,21 +2,16 @@
 # Usage: ./1-world_wide_web <domain> <subdomain>
 # Displaying information about the  subdomains.
 
-
-print_record ()
-{
-    printf "The subdomain %s is a " "$2"
-    dig "$2.$1" | grep -A1 'ANSWER SECTION:' | awk -F' ' '{ printf $4 }'
-    printf " record and points to "
-    dig "$2.$1" | grep -A1 'ANSWER SECTION:' | awk -F' ' '{ printf $5 }'
-    echo ""
+output () {
+    dig "$1" | grep -A1 'ANSWER SECTION:' | sed -r "s/$1./$2/g" |  awk -F" " ' NR==2 { print "The subdomain " $1 " is a " $4 " record and points to "$5 }'
 }
 
-if [ -z "$2" ]; then
-   for subs in "www" "lb-01" "web-01" "web-02"
-   do
-       print_record "$1" "$subs"
-   done
+if [ "$#" -eq 2 ]
+then
+    output "$2.$1" "$2"
 else
-    print_record "$1" "$2"
+    output "www.$1" 'www'
+    output "lb-01.$1" 'lb-01'
+    output "web-01.$1" 'web-01'
+    output "web-02.$1" 'web-02'
 fi
